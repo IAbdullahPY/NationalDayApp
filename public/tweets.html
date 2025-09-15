@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Tweet Stack (fits 16:9, RTL/LTR auto)</title>
+<title>Tweet Stack (Responsive)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
   /* Page / background */
@@ -10,39 +10,57 @@
   .stage { position:relative; width:100vw; height:100vh; overflow:hidden; display:grid; place-items:center; }
   .bg { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#000; z-index:0; }
 
-  /* Frame (16:9 safe area) */
+  /* Frame */
   .frame {
-    position:absolute; z-index:1;
-    left:50%; top:50%; transform:translate(-50%, -50%);
-    width: min(100vw, calc(100vh * 16 / 9));
-    height: min(100vh, calc(100vw * 9 / 16));
-    display:flex; align-items:center; justify-content:center;
-    pointer-events:none;
+    position: absolute; 
+    z-index: 1;
+    left: 50%; 
+    top: 50%; 
+    transform: translate(-50%, -50%);
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    pointer-events: none;
+    width: 100vw;
+    height: 100vh;
   }
 
-  /* Stack of tweets */
+  /* Default (mobile & vertical screens) */
   .stack {
-    width: min(28%, 360px);  /* wider tweets */
+    width: 85vw;
+    max-width: 750px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    margin-top: 40px;
+    gap: 20px;
+    margin-top: 15vh;
   }
 
-  /* Tweet bubble */
   .tweet {
     position: relative;
     background: url("assets/bubble.gif") center/cover no-repeat;
     color: #ffffff;
     border-radius: 18px;
-    padding: 14px 28px 12px 20px; /* balanced padding */
+    padding: 2vh 2vw;
     box-shadow: 0 10px 28px rgba(0,0,0,.28);
-    min-height: 64px;
+    min-height: 10vh;
     opacity: 0;
     transform: translateY(22px);
     transition: opacity .5s ease, transform .5s ease;
-    font-size: 0.9em;
+    font-size: 2vh;
     max-width: 100%;
+  }
+
+  /* Laptops / wide screens */
+  @media (min-aspect-ratio: 16/10) {
+    .stack {
+      width: 25vw;
+      max-width: 380px;
+    }
+    .tweet {
+      font-size: 1.2em;
+      min-height: 80px;
+      padding: 16px 20px;
+    }
   }
 
   /* Show bubbles */
@@ -52,39 +70,42 @@
   }
 
   /* Name */
-.name {
-  position:absolute;
-  top:8px;
-  left:16px;
-  right:16px;   /* allow it to align on both sides */
-  font-weight:700;
-  font-size:14px;
-  color:#fff;
-}
+  .name {
+    position:absolute;
+    top:8px;
+    left:16px;
+    right:16px;
+    font-weight:700;
+    font-size:14px;
+    color:#fff;
+  }
 
   /* Text */
   .text {
     margin-top:26px;
-    font-size:18px; line-height:1.42; font-weight:600;
+    font-size:18px; 
+    line-height:1.42; 
+    font-weight:600;
     word-break:break-word;
-  }
-
-  /* Peek wrapper */
-  .peek-wrap {
-    position: relative;
-    margin-top: -4px;
-    overflow: hidden;
-  }
-
-  /* The faded 4th tweet (peek) */
-  .tweet.peek {
-    opacity: .42;
-    transform: translateY(8px) scale(.985);
   }
 
   /* Exit animation */
   @keyframes slideOut { to { opacity:0; transform:translateY(-22px); } }
   .anim-out { animation:slideOut .38s ease forwards; }
+
+  /* Large vertical screen (e.g. 1080x1920) */
+  @media (min-height: 1500px) and (max-width: 1200px) {
+    .stack {
+      width: 95%;
+      max-width: 1100px;
+      gap: 30px;
+    }
+    .tweet {
+      font-size: 1.4em;
+      min-height: 140px;
+      padding: 24px 32px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -104,7 +125,7 @@
     return /[\u0600-\u06FF]/.test(s || "");
   }
 
-  // Fetch all messages (oldest → newest)
+  // Fetch all messages
   async function fetchAll() {
     const res = await fetch('/api/messages');
     const data = await res.json();
@@ -118,81 +139,65 @@
   }
 
   // Create tweet bubble
-function bubble(item, extraClass = "") {
-  const el = document.createElement('div');
-  el.className = `tweet ${extraClass}`;
-  const dir = isArabic(item.text) ? 'rtl' : 'ltr';
-  el.innerHTML = `
-    <div class="name" style="direction:${dir}; text-align:${dir==='rtl'?'right':'left'};">
-      ${item.name || ""}
-    </div>
-    <div class="text" style="direction:${dir}; text-align:${dir==='rtl'?'right':'left'};">
-      ${item.text || ""}
-    </div>
-  `;
-  return el;
-}
-
-  // Render 3 tweets + peek
-function render() {
-  const stack = document.getElementById('stack');
-  stack.innerHTML = "";
-
-  if (!messages.length) return;
-
-  // Main 3 (or fewer if not enough messages)
-  const a = messages[(head + 0) % messages.length];
-  const b = messages.length > 1 ? messages[(head + 1) % messages.length] : a;
-  const c = messages.length > 2 ? messages[(head + 2) % messages.length] : b;
-
-  const t1 = bubble(a); t1.classList.add('show');
-  const t2 = bubble(b); t2.classList.add('show');
-  const t3 = bubble(c); t3.classList.add('show');
-
-  stack.appendChild(t1);
-  stack.appendChild(t2);
-  stack.appendChild(t3);
-
-  // 👉 Force 4th peek (even if only duplicates)
-  let p;
-  if (messages.length > 3) {
-    p = messages[(head + 3) % messages.length];
-  } else {
-    // repeat the last available message as peek
-    p = messages[messages.length - 1];
+  function bubble(item, extraClass = "") {
+    const el = document.createElement('div');
+    el.className = `tweet ${extraClass}`;
+    const dir = isArabic(item.text) ? 'rtl' : 'ltr';
+    el.innerHTML = `
+      <div class="name" style="direction:${dir}; text-align:${dir==='rtl'?'right':'left'};">
+        ${item.name || ""}
+      </div>
+      <div class="text" style="direction:${dir}; text-align:${dir==='rtl'?'right':'left'};">
+        ${item.text || ""}
+      </div>
+    `;
+    return el;
   }
 
-  const wrap = document.createElement('div');
-  wrap.className = 'peek-wrap';
-  const peek = bubble(p, 'peek show');
-  wrap.appendChild(peek);
-  stack.appendChild(wrap);
-}
+  // Render 4 tweets
+  function render() {
+    const stack = document.getElementById('stack');
+    stack.innerHTML = "";
+
+    if (!messages.length) return;
+
+    const a = messages[(head + 0) % messages.length];
+    const b = messages.length > 1 ? messages[(head + 1) % messages.length] : a;
+    const c = messages.length > 2 ? messages[(head + 2) % messages.length] : b;
+    const d = messages.length > 3 ? messages[(head + 3) % messages.length] : c;
+
+    const t1 = bubble(a); t1.classList.add('show');
+    const t2 = bubble(b); t2.classList.add('show');
+    const t3 = bubble(c); t3.classList.add('show');
+    const t4 = bubble(d); t4.classList.add('show');
+
+    stack.appendChild(t1);
+    stack.appendChild(t2);
+    stack.appendChild(t3);
+    stack.appendChild(t4);
+  }
 
   // Rotate every 10s
   function tick() {
-    document.querySelectorAll('.tweet:not(.peek)').forEach(n => n.classList.add('anim-out'));
+    document.querySelectorAll('.tweet').forEach(n => n.classList.add('anim-out'));
     setTimeout(() => {
-      head = (head + 3) % messages.length;
+      head = (head + 4) % messages.length;
       render();
-    }, 380); // match CSS anim
+    }, 380); 
   }
 
   // Start loop
   async function start() {
     await fetchAll();
-    // show the last 3 first
-    if (messages.length > 3) {
-      head = messages.length - 3;
+    if (messages.length > 4) {
+      head = messages.length - 4;
     }
     render();
 
-    // Cycle every 10s
     setInterval(() => {
       tick();
     }, 10000);
 
-    // Refresh DB every 10s
     setInterval(async () => {
       await fetchAll();
     }, 10000);
