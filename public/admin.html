@@ -132,8 +132,11 @@
       URL.revokeObjectURL(url);
     }
 
-    // Load messages on page start
-    loadMessages();
+  // Load messages on page start
+loadMessages();
+
+// Auto-refresh every 1 second
+setInterval(loadMessages, 1000);
   </script>
 </body>
 </html>

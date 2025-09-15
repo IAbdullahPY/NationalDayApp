@@ -1,29 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>Submit Message</title>
+  <meta charset="UTF-8">
+  <title>إرسال رسالة</title>
+  <style>
+    body {
+      font-family: "Tahoma", sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+    .form-box {
+      background: #fff;
+      padding: 30px 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      width: 400px;
+      text-align: center;
+    }
+    h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 20px;
+      color: #2c3e50;
+    }
+    input, textarea {
+      width: 100%;
+      margin: 8px 0;
+      padding: 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      text-align: right;
+    }
+    textarea {
+      resize: none;
+      height: 100px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background: #27ae60;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #219150;
+    }
+  </style>
 </head>
 <body>
-<h1>Send a Message</h1>
-<form id="msgForm">
-  Name: <input type="text" id="name" required><br><br>
-  Message: <textarea id="message" required></textarea><br><br>
-  <button type="submit">Send</button>
-</form>
-<script>
-  document.getElementById('msgForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const name = document.getElementById('name').value;
-    const message = document.getElementById('message').value;
-    await fetch('/api/messages', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ name, message })
+  <div class="form-box">
+    <h2>اكتب رسالتك للوطن</h2>
+    <form id="msgForm">
+      <input type="text" id="name" placeholder="الاسم" required>
+      <textarea id="message" placeholder="الرسالة" required></textarea>
+      <button type="submit">إرسال</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('msgForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const message = document.getElementById('message').value;
+      await fetch('/api/messages', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ name, message })
+      });
+      window.location.href = "/success.html";
     });
-    alert('Message sent!');
-    document.getElementById('msgForm').reset();
-  });
-</script>
+  </script>
 </body>
 </html>

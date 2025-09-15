@@ -24,7 +24,7 @@ app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
   // 👇 Change this to your real admin credentials
-  if (username === "admin" && password === "123456") {
+  if (username === "admin" && password === "X7p!d9@LmQ") {
     req.session.user = username;
     return res.send({ success: true });
   }
