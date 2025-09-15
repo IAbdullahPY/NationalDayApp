@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Slideshow Controller</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="viewer" src="display1.html"></iframe>
+
+  <script>
+    const pages = [
+      { url: "display1.html", duration: 2000 },
+      { url: "display2.html", duration: 2000 },
+      { url: "display3.html", duration: 2000 },
+      { url: "display4.html", duration: 2000 },
+      { url: "display5.html", duration: 2000 },
+      { url: "display6.html", duration: 2000 },
+      { url: "index.html",    duration: 40000 }
+    ];
+
+    let index = 0;
+    const iframe = document.getElementById("viewer");
+
+    function cycle() {
+      const page = pages[index];
+      iframe.src = page.url;
+
+      setTimeout(() => {
+        index = (index + 1) % pages.length;
+        cycle();
+      }, page.duration);
+    }
+
+    cycle();
+  </script>
+</body>
+</html>

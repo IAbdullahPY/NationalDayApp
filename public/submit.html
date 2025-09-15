@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Submit Message</title>
+</head>
+<body>
+<h1>Send a Message</h1>
+<form id="msgForm">
+  Name: <input type="text" id="name" required><br><br>
+  Message: <textarea id="message" required></textarea><br><br>
+  <button type="submit">Send</button>
+</form>
+<script>
+  document.getElementById('msgForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const message = document.getElementById('message').value;
+    await fetch('/api/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ name, message })
+    });
+    alert('Message sent!');
+    document.getElementById('msgForm').reset();
+  });
+</script>
+</body>
+</html>

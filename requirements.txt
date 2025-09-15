@@ -1,0 +1,31 @@
+## System Requirements
+- Node.js version 18 or higher
+- npm version 9 or higher
+- Works on Linux, Windows, or macOS
+
+## Dependencies
+Install via npm:
+- express
+- body-parser
+- cors
+- sqlite3
+- express-session
+
+## Setup Instructions
+1. Install Node.js from https://nodejs.org
+2. Open terminal in project folder
+3. Run:
+   npm install
+4. Start server:
+   node server.js
+
+## Usage
+- http://localhost:3000/index.html      → slideshow Page
+- http://localhost:3000/submit.html     → Submit new messages
+- http://localhost:3000/login.html      → Admin login page
+- http://localhost:3000/admin.html      → Admin panel (requires login)
+- http://localhost:3000/tweets.html     → Display tweets (screen view)
+
+## Admin Login
+- Username: admin
+- Password: 123456
