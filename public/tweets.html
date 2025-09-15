@@ -2,15 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Tweet Stack (Responsive)</title>
+<title>Tweet Stack (Responsive Smooth Fade)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-  /* Page / background */
   html, body { height:100%; margin:0; background:#000; }
   .stage { position:relative; width:100vw; height:100vh; overflow:hidden; display:grid; place-items:center; }
   .bg { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#000; z-index:0; }
 
-  /* Frame */
   .frame {
     position: absolute; 
     z-index: 1;
@@ -20,12 +18,10 @@
     display: flex; 
     align-items: center; 
     justify-content: center;
-    pointer-events: none;
     width: 100vw;
     height: 100vh;
   }
 
-  /* Default (mobile & vertical screens) */
   .stack {
     width: 85vw;
     max-width: 750px;
@@ -33,6 +29,7 @@
     flex-direction: column;
     gap: 20px;
     margin-top: 15vh;
+    position: relative;
   }
 
   .tweet {
@@ -43,14 +40,29 @@
     padding: 2vh 2vw;
     box-shadow: 0 10px 28px rgba(0,0,0,.28);
     min-height: 10vh;
-    opacity: 0;
-    transform: translateY(22px);
-    transition: opacity .5s ease, transform .5s ease;
     font-size: 2vh;
     max-width: 100%;
+    opacity: 0; /* start hidden */
   }
 
-  /* Laptops / wide screens */
+  /* Enter fade-in */
+  .tweet.enter {
+    opacity: 0;
+  }
+  .tweet.enter-active {
+    opacity: 1;
+    transition: opacity 1.2s ease; /* smoother entrance */
+  }
+
+  /* Exit fade-out */
+  .tweet.exit {
+    opacity: 1;
+  }
+  .tweet.exit-active {
+    opacity: 0;
+    transition: opacity 0.8s ease; /* faster exit */
+  }
+
   @media (min-aspect-ratio: 16/10) {
     .stack {
       width: 25vw;
@@ -63,13 +75,6 @@
     }
   }
 
-  /* Show bubbles */
-  .tweet.show { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
-
-  /* Name */
   .name {
     position:absolute;
     top:8px;
@@ -80,7 +85,6 @@
     color:#fff;
   }
 
-  /* Text */
   .text {
     margin-top:26px;
     font-size:18px; 
@@ -89,11 +93,6 @@
     word-break:break-word;
   }
 
-  /* Exit animation */
-  @keyframes slideOut { to { opacity:0; transform:translateY(-22px); } }
-  .anim-out { animation:slideOut .38s ease forwards; }
-
-  /* Large vertical screen (e.g. 1080x1920) */
   @media (min-height: 1500px) and (max-width: 1200px) {
     .stack {
       width: 95%;
@@ -120,12 +119,10 @@
   let messages = [];
   let head = 0;
 
-  // Detect if text is Arabic
   function isArabic(s) {
     return /[\u0600-\u06FF]/.test(s || "");
   }
 
-  // Fetch all messages
   async function fetchAll() {
     const res = await fetch('/api/messages');
     const data = await res.json();
@@ -138,7 +135,6 @@
     }
   }
 
-  // Create tweet bubble
   function bubble(item, extraClass = "") {
     const el = document.createElement('div');
     el.className = `tweet ${extraClass}`;
@@ -154,39 +150,41 @@
     return el;
   }
 
-  // Render 4 tweets
   function render() {
     const stack = document.getElementById('stack');
-    stack.innerHTML = "";
+    const oldTweets = Array.from(stack.children);
 
-    if (!messages.length) return;
+    // Animate old tweets out
+    oldTweets.forEach(el => {
+      el.classList.add('exit');
+      requestAnimationFrame(() => el.classList.add('exit-active'));
+    });
 
-    const a = messages[(head + 0) % messages.length];
-    const b = messages.length > 1 ? messages[(head + 1) % messages.length] : a;
-    const c = messages.length > 2 ? messages[(head + 2) % messages.length] : b;
-    const d = messages.length > 3 ? messages[(head + 3) % messages.length] : c;
-
-    const t1 = bubble(a); t1.classList.add('show');
-    const t2 = bubble(b); t2.classList.add('show');
-    const t3 = bubble(c); t3.classList.add('show');
-    const t4 = bubble(d); t4.classList.add('show');
-
-    stack.appendChild(t1);
-    stack.appendChild(t2);
-    stack.appendChild(t3);
-    stack.appendChild(t4);
-  }
-
-  // Rotate every 10s
-  function tick() {
-    document.querySelectorAll('.tweet').forEach(n => n.classList.add('anim-out'));
+    // Remove old after animation
     setTimeout(() => {
-      head = (head + 4) % messages.length;
-      render();
-    }, 380); 
+      oldTweets.forEach(el => el.remove());
+
+      // Add new tweets
+      const items = [];
+      for (let i = 0; i < 4; i++) {
+        const msg = messages[(head + i) % messages.length];
+        const el = bubble(msg, 'enter');
+        items.push(el);
+        stack.appendChild(el);
+      }
+
+      // Trigger fade-in
+      requestAnimationFrame(() => {
+        items.forEach(el => el.classList.add('enter-active'));
+      });
+    }, 800); // match exit duration
   }
 
-  // Start loop
+  function tick() {
+    head = (head + 4) % messages.length;
+    render();
+  }
+
   async function start() {
     await fetchAll();
     if (messages.length > 4) {
@@ -194,13 +192,8 @@
     }
     render();
 
-    setInterval(() => {
-      tick();
-    }, 10000);
-
-    setInterval(async () => {
-      await fetchAll();
-    }, 10000);
+    setInterval(() => tick(), 10000);
+    setInterval(async () => await fetchAll(), 10000);
   }
 
   start();
