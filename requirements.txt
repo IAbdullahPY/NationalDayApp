@@ -28,4 +28,4 @@ Install via npm:
 
 ## Admin Login
 - Username: admin
-- Password: 123456
+- Password: Foaj@2030

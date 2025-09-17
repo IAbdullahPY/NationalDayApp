@@ -2,68 +2,92 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>إرسال رسالة</title>
+  <title>عبر للوطن بطريقتك</title>
   <style>
+    @font-face {
+      font-family: "Saudi";
+      src: url("assets/fonts/SaudiRegular.otf") format("opentype");
+      font-weight: normal;
+      font-style: normal;
+    }
+
     body {
-      font-family: "Tahoma", sans-serif;
-      background: #f5f5f5;
+      font-family: "Saudi", sans-serif; /* Use your custom font */
+      background: url("assets/bgsubmit.png") no-repeat center center fixed;
+      background-size: cover;
       margin: 0;
       display: flex;
       height: 100vh;
       justify-content: center;
       align-items: center;
     }
-    .form-box {
-      background: #fff;
-      padding: 30px 25px;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-      width: 400px;
-      text-align: center;
+
+    .form-wrapper {
+      position: relative;
+      width: 600px;   /* Match image width */
+      height: 400px;  /* Match image height */
     }
-    h2 {
-      margin-top: 0;
-      margin-bottom: 20px;
-      font-size: 20px;
-      color: #2c3e50;
-    }
-    input, textarea {
+
+    .form-wrapper img {
       width: 100%;
-      margin: 8px 0;
-      padding: 12px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-sizing: border-box;
+      height: 100%;
+      display: block;
+    }
+
+    form {
+      position: absolute;
+      inset: 0;
+    }
+
+    input, textarea {
+      position: absolute;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 20px;
+      font-family: "Saudi", sans-serif; /* Force custom font */
+      color: #000;
       text-align: right;
     }
-    textarea {
+
+    /* Name field */
+    #name {
+      top: 35px;    
+      right: 185px;  
+      width: 310px;
+      height: 42px;
+    }
+
+    /* Message field */
+    #message {
+      top: 135px;
+      right: 105px;
+      width: 400px;
+      height: 135px;
       resize: none;
-      height: 100px;
     }
+
+    /* Submit button */
     button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 12px;
-      font-size: 16px;
+      position: absolute;
+      bottom: 56px;    
+      left: 48.8%;
+      transform: translateX(-50%);
+      width: 334px;
+      height: 60px;
+      background: transparent;
       border: none;
-      border-radius: 6px;
-      background: #27ae60;
-      color: #fff;
       cursor: pointer;
-    }
-    button:hover {
-      background: #219150;
+      border-radius: 30px;  /* Rounded corners */
     }
   </style>
 </head>
 <body>
-  <div class="form-box">
-    <h2>اكتب رسالتك للوطن</h2>
+  <div class="form-wrapper">
     <form id="msgForm">
-      <input type="text" id="name" placeholder="الاسم" required>
-      <textarea id="message" placeholder="الرسالة" required></textarea>
-      <button type="submit">إرسال</button>
+      <input type="text" id="name" required>
+      <textarea id="message" required></textarea>
+      <button type="submit"></button>
     </form>
   </div>
 
@@ -72,6 +96,10 @@
       e.preventDefault();
       const name = document.getElementById('name').value;
       const message = document.getElementById('message').value;
+      if (message.length > 54) {
+        alert("تجاوزت الحد المسموح");
+        return;
+      }
       await fetch('/api/messages', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},

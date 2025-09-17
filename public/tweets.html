@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Tweet Stack (GIF Full + Text Fade)</title>
+<title>التغريدات</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
   html, body { height:100%; margin:0; background:#000; }
@@ -34,6 +34,7 @@
 
 .tweet {
   position: relative;
+  border-radius: 36px;
   overflow: hidden;
 }
 
@@ -44,18 +45,18 @@
   display: block;
 }
 
-  .overlay {
+/* CSS */
+.overlay {
   position: absolute;
   inset: 0;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;   /* 👈 المحاذاة لليمين */
-  justify-content: flex-start; /* 👈 يبدأ من فوق */
+  flex-direction: column; 
+  align-items: flex-start;
+  justify-content: flex-start;
   color: #fff;
-  padding: 12px 16px;  /* مسافة من الحواف */
-  text-align: right;
-  opacity: 0;
-  transition: opacity 0.5s ease;
+  padding: 16px;
+  opacity: 0; 
+  transition: opacity 0.40s ease; 
 }
 
 .overlay.show {
@@ -63,27 +64,36 @@
 }
 
 .name {
-  font-family: 'Saudi', sans-serif !important;
-  font-weight: 700;
-  font-size: 18px !important;   /* زودتها عشان يبان الفرق */
-  margin-bottom: 8px;
+  font-family: 'Saudi', sans-serif;
+  font-weight: 1000px;
+  font-size: 22px !important;
+  text-align: right; 
+  /* 👇 control position and size */
+  position: absolute;  
+  top: 10px;     
+  right: 20px;  
+  width: 180px;  
+  height: 30px;  
+
+  overflow: hidden; /* hides overflow text */
 }
 
 .text {
-  font-family: 'Saudi', sans-serif !important;
-  font-size: 20px !important;
+  font-family: 'SaudiB', sans-serif;
+  font-size: 27px !important;
   line-height: 1.5;
-  font-weight: 600;
-  word-break: break-word;
-  white-space: pre-line; /* 👈 يحافظ على الأسطر */
+  font-weight: 400;
+  white-space: pre-wrap;    
+  word-break: break-word;    
+  text-align: right;
+  /* 👇 control position and size */
+  position: absolute; 
+  top: 50px;      
+  right: 120px;    
+  width: 230px;   
+  height: 60px;   
 
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-
-  line-clamp: 3;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: hidden; 
 }
 
   @media (min-aspect-ratio: 16/10) {
@@ -95,6 +105,12 @@
   @font-face {
   font-family: 'Saudi';
   src: url('assets/fonts/SaudiRegular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+ @font-face {
+  font-family: 'SaudiB';
+  src: url('assets/fonts/SaudiBold.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }
@@ -133,6 +149,25 @@
     return /[\u0600-\u06FF]/.test(s || "");
   }
 
+  function adjustTextSize(el) {
+  const maxWidth = el.offsetWidth;
+  const maxHeight = el.offsetHeight;
+  let fontSize = 27; // initial font size
+  const text = el.textContent;
+
+  // reset to initial size
+  el.style.setProperty("font-size", fontSize + "px", "important");
+
+  // shrink until it fits inside the box
+  while (
+    (el.scrollHeight > maxHeight || el.scrollWidth > maxWidth) &&
+    fontSize > 10
+  ) {
+    fontSize -= 1;
+    el.style.setProperty("font-size", fontSize + "px", "important");
+  }
+}
+
   async function fetchAll() {
     const res = await fetch('/api/messages');
     const data = await res.json();
@@ -144,40 +179,47 @@
       messages = [{ name: "", text: "Waiting for messages…" }];
     }
   }
+const fadeDuration = 450;      
+const displayDuration = 10000;  
+function render() {
+  const tweets = document.querySelectorAll('.tweet');
+  tweets.forEach((tweet, i) => {
+    const overlay = tweet.querySelector('.overlay');
 
-  function render() {
-    const tweets = document.querySelectorAll('.tweet');
-    tweets.forEach((tweet, i) => {
-      const overlay = tweet.querySelector('.overlay');
-      overlay.classList.remove('show'); // hide current text
-      setTimeout(() => {
-        const msg = messages[(head + i) % messages.length];
-        const dir = isArabic(msg.text) ? 'rtl' : 'ltr';
-        overlay.querySelector('.name').textContent = msg.name || "";
-        overlay.querySelector('.text').textContent = msg.text || "";
-        overlay.style.direction = dir;
-        overlay.style.textAlign = dir === 'rtl' ? 'right' : 'left';
-        overlay.classList.add('show'); // fade in
-      }, 500); // wait for fade-out
-    });
+    // fade out
+    overlay.classList.remove('show');
+
+    setTimeout(() => {
+      const msg = messages[(head + i) % messages.length];
+      const dir = isArabic(msg.text) ? 'rtl' : 'ltr';
+      overlay.querySelector('.name').textContent = msg.name || "";
+      overlay.querySelector('.text').textContent = msg.text || "";
+      overlay.style.direction = dir;
+      overlay.style.textAlign = dir === 'rtl' ? 'right' : 'left';
+      adjustTextSize(overlay.querySelector('.text'));
+
+      // fade in
+      overlay.classList.add('show');
+    }, fadeDuration); 
+  });
+}
+
+function tick() {
+  head = (head + 4) % messages.length;
+  render();
+}
+
+async function start() {
+  await fetchAll();
+  if (messages.length > 4) {
+    head = messages.length - 4;
   }
+  render();
+  setInterval(() => tick(), displayDuration); 
+  setInterval(async () => await fetchAll(), 10000);
+}
 
-  function tick() {
-    head = (head + 4) % messages.length;
-    render();
-  }
-
-  async function start() {
-    await fetchAll();
-    if (messages.length > 4) {
-      head = messages.length - 4;
-    }
-    render();
-    setInterval(() => tick(), 10000);
-    setInterval(async () => await fetchAll(), 10000);
-  }
-
-  start();
+start();
 </script>
 </body>
 </html>

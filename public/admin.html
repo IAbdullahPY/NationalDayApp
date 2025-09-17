@@ -2,42 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Panel</title>
+  <title>ادارة الرسائل</title>
   <style>
+    @font-face {
+  font-family: 'Saudi';
+  src: url('assets/fonts/SaudiRegular.otf') format('truetype');
+}
+
+body {
+}
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f5f5f5;
+  font-family: 'Saudi', sans-serif;
+      margin: 15px;
+      background: url("assets/plain.png") no-repeat center center fixed;
+      background-size: cover;
       color: #333;
     }
     h1 {
       margin-bottom: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: left;
-    }
-    th {
-      background: #333;
       color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+
+      font-size: 28px;    
+      text-align: center; 
     }
-    tr:nth-child(even) {
-      background: #f9f9f9;
+    div {
+      text-align: center; 
+      margin-bottom: 15px;
     }
     button {
-      padding: 6px 12px;
-      margin: 4px;
+      padding: 8px 16px;  
+      margin: 6px;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 15px;   
     }
     .delete-btn {
       background: #e74c3c;
@@ -55,54 +54,87 @@
       background: #2980b9;
       color: #fff;
     }
+
+table {
+  width: 1000px;              
+  height: 550px;         
+  margin: 0 auto;            
+  display: block;           
+  overflow: auto;          
+  border-collapse: collapse;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  font-size: 15px;
+  table-layout: auto;      
+}
+    th, td {
+      padding: 12px;      
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background: #333;
+      color: #fff;
+      font-size: 16px;  
+    }
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
   </style>
 </head>
 <body>
-  <h1>Messages Admin Panel</h1>
+  <h1>رسائل اليوم الوطني</h1>
   <div>
-    <button class="refresh-btn" onclick="loadMessages()">🔄 Refresh</button>
-    <button class="clear-btn" onclick="clearMessages()">🗑 Clear All</button>
-    <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="refresh-btn" onclick="loadMessages()">🔄 حدث الصفحة</button>
+    <button class="clear-btn" onclick="clearMessages()">🗑 احذف كل الرسايل</button>
+    <button class="export-btn" onclick="exportCSV()">⬇ تصدير كملف</button>
   </div>
   <br>
-  <table id="msgTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Message</th>
-        <th>Created At</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<table id="msgTable">
+  <colgroup>
+    <col style="width: 8%">   <!-- ID -->
+    <col style="width: 18%">  <!-- Name -->
+    <col style="width: 48%">  <!-- Message -->
+    <col style="width: 20%">  <!-- Created At -->
+    <col style="width: 6%">   <!-- Action -->
+  </colgroup>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Message</th>
+      <th>Created At</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
   <script>
-        // 👇 LOGIN CHECK (must come first)
     fetch('/api/admin/messages')
       .then(res => {
         if (res.status === 403) {
-          window.location.href = "/login.html"; // redirect if not logged in
+          window.location.href = "/login.html";
         }
       });
-    async function loadMessages() {
-      const res = await fetch('/api/admin/messages');
-      const data = await res.json();
-      const tbody = document.querySelector("#msgTable tbody");
-      tbody.innerHTML = "";
-      data.forEach(msg => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${msg.id}</td>
-          <td>${msg.name}</td>
-          <td>${msg.message}</td>
-          <td>${msg.created_at}</td>
-          <td><button class="delete-btn" onclick="deleteMessage(${msg.id})">Delete</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
+
+   async function loadMessages() {
+  const res = await fetch('/api/admin/messages');
+  const data = await res.json();
+  const tbody = document.querySelector("#msgTable tbody");
+  tbody.innerHTML = "";
+  data.forEach((msg, index) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${msg.name}</td>
+      <td>${msg.message}</td>
+      <td>${msg.created_at}</td>
+      <td><button class="delete-btn" onclick="deleteMessage(${msg.id})">حذف</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
 
     async function deleteMessage(id) {
       if (!confirm("Delete this message?")) return;
@@ -132,11 +164,8 @@
       URL.revokeObjectURL(url);
     }
 
-  // Load messages on page start
-loadMessages();
-
-// Auto-refresh every 1 second
-setInterval(loadMessages, 1000);
+    loadMessages();
+    setInterval(loadMessages, 1000);
   </script>
 </body>
 </html>
