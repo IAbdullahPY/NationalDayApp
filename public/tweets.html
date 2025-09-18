@@ -50,17 +50,16 @@
   position: absolute;
   inset: 0;
   display: flex;
-  flex-direction: column; 
-  align-items: flex-start;
+  flex-direction: column;
   justify-content: flex-start;
   color: #fff;
   padding: 16px;
-  opacity: 0; 
-  transition: opacity 0.40s ease; 
+  opacity: 1;                  /* 👈 force visible on page load */
+  transition: opacity 0.5s ease;
+  z-index: 10;
 }
-
-.overlay.show {
-  opacity: 1;
+.overlay.hidden {
+  opacity: 0;                  /* fade out */
 }
 
 .name {
@@ -179,29 +178,33 @@
       messages = [{ name: "", text: "Waiting for messages…" }];
     }
   }
-const fadeDuration = 450;      
-const displayDuration = 10000;  
+let firstRender = true;
+const fadeDuration = 500;       // ms
+const displayDuration = 10000;  // 10s
+
 function render() {
   const tweets = document.querySelectorAll('.tweet');
   tweets.forEach((tweet, i) => {
     const overlay = tweet.querySelector('.overlay');
+    const msg = messages[(head + i) % messages.length];
+    const dir = isArabic(msg.text) ? 'rtl' : 'ltr';
 
-    // fade out
-    overlay.classList.remove('show');
+    overlay.querySelector('.name').textContent = msg.name || "";
+    overlay.querySelector('.text').textContent = msg.text || "";
+    overlay.style.direction = dir;
+    overlay.style.textAlign = dir === 'rtl' ? 'right' : 'left';
+    adjustTextSize(overlay.querySelector('.text'));
 
-    setTimeout(() => {
-      const msg = messages[(head + i) % messages.length];
-      const dir = isArabic(msg.text) ? 'rtl' : 'ltr';
-      overlay.querySelector('.name').textContent = msg.name || "";
-      overlay.querySelector('.text').textContent = msg.text || "";
-      overlay.style.direction = dir;
-      overlay.style.textAlign = dir === 'rtl' ? 'right' : 'left';
-      adjustTextSize(overlay.querySelector('.text'));
-
-      // fade in
-      overlay.classList.add('show');
-    }, fadeDuration); 
+    if (!firstRender) {
+      // normal fade transition after first time
+      overlay.classList.add('hidden'); // fade out
+      setTimeout(() => {
+        overlay.classList.remove('hidden'); // fade in with new text
+      }, fadeDuration);
+    }
   });
+
+  firstRender = false; // after first run, use fade logic
 }
 
 function tick() {
