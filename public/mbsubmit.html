@@ -45,7 +45,6 @@
       outline: none;
       font-size: 4vw; /* 👈 حجم خط نسبي للشاشة */
       text-align: right;
-      border: 1px solid red;
     }
 
     /* Message field */
@@ -61,7 +60,6 @@
       font-size: 4vw;
       text-align: right;
       resize: none;
-      border: 1px solid red;
     }
 
     /* Submit button */
@@ -76,7 +74,6 @@
       border: none;
       cursor: pointer;
       border-radius: 25px;
-      border: 1px solid red;
     }
   </style>
 </head>
@@ -95,7 +92,7 @@
       const name = document.getElementById('name').value;
       const message = document.getElementById('message').value;
       if (message.length > 54) {
-        alert("تجاوزت الحد المسموح");
+        alert("تجاوزت الحد المسموح في الكتابة");
         return;
       }
       await fetch('/api/messages', {

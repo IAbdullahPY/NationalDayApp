@@ -96,7 +96,7 @@
       const name = document.getElementById('name').value;
       const message = document.getElementById('message').value;
       if (message.length > 54) {
-        alert("تجاوزت الحد المسموح");
+        alert("تجاوزت الحد المسموح في الكتابة");
         return;
       }
       await fetch('/api/messages', {
