@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>إرسال رسالة - موبايل</title>
+  <style>
+    @font-face {
+      font-family: "Saudi";
+      src: url("assets/fonts/SaudiRegular.otf") format("opentype");
+    }
+
+    body {
+      font-family: "Saudi", sans-serif;
+      background: url("assets/bgmbsubmit.jpeg") no-repeat center center fixed; /* 👈 خلفية الموبايل */
+      background-size: cover;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .form-wrapper {
+      position: relative;
+      width: 90vw;    /* 👈 يغطي 90% من عرض شاشة الجوال */
+      height: 90vh;   /* 👈 يغطي 90% من طول شاشة الجوال */
+      max-width: 450px; /* 👈 حد أقصى للعرض */
+      max-height: 800px; /* 👈 حد أقصى للطول */
+    }
+
+    form {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* Name field */
+    #name {
+      position: absolute;
+      top: 33%;       /* 👈 نسبة من طول الشاشة */
+      right: 6%;     /* 👈 نسبة من عرض الشاشة */
+      width: 120%;     /* 👈 يغطي 80% من عرض الفورم */
+      height: 9%;     /* 👈 ارتفاع نسبي */
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 4vw; /* 👈 حجم خط نسبي للشاشة */
+      text-align: right;
+      border: 1px solid red;
+    }
+
+    /* Message field */
+    #message {
+      position: absolute;
+      top: 55%;
+      right: -25%;
+      width: 155%;
+      height: 33%;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 4vw;
+      text-align: right;
+      resize: none;
+      border: 1px solid red;
+    }
+
+    /* Submit button */
+    button {
+      position: absolute;
+      bottom: -3%;
+      left: 48%;
+      transform: translateX(-50%);
+      width: 135%;
+      height: 12%;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      border-radius: 25px;
+      border: 1px solid red;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-wrapper">
+    <form id="msgForm">
+      <input type="text" id="name" required>
+      <textarea id="message" required></textarea>
+      <button type="submit"></button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('msgForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const message = document.getElementById('message').value;
+      if (message.length > 54) {
+        alert("تجاوزت الحد المسموح");
+        return;
+      }
+      await fetch('/api/messages', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ name, message })
+      });
+      window.location.href = "/mbsuccess.html";
+    });
+  </script>
+</body>
+</html>

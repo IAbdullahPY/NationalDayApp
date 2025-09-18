@@ -18,14 +18,7 @@ Install via npm:
    npm install
 4. Start server:
    node server.js
-
-## Usage
-- http://localhost:3000/index.html      → slideshow Page
-- http://localhost:3000/submit.html     → Submit new messages
-- http://localhost:3000/login.html      → Admin login page
-- http://localhost:3000/admin.html      → Admin panel (requires login)
-- http://localhost:3000/tweets.html     → Display tweets (screen view)
-
+   
 ## Admin Login
 - Username: admin
 - Password: Foaj@2030

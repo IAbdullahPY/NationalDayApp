@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: "Tahoma", sans-serif;
-      background: url("assets/bgsuccess.png") no-repeat center center fixed;
+      background: url("assets/bgsuccess-mobile.png") no-repeat center center fixed; /* 👈 خلي صورة خاصة للجوال */
       background-size: cover;
       margin: 0;
       display: flex;
@@ -14,43 +14,40 @@
       justify-content: center;
       align-items: center;
     }
+
     .success-wrapper {
       position: relative;
-      width: 600px;  
-      height: 400px; 
+      width: 90vw;       /* 👈 يناسب أي جوال */
+      max-width: 400px;  /* 👈 ما يكبر أكثر */
+      height: 70vh;      /* 👈 طول نسبي */
+      max-height: 700px;
     }
-    .success-wrapper img {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
+
     .success-content {
       position: absolute;
       inset: 0;
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      padding-bottom: 30px;
+      padding: 20px;
     }
 
-a {
-  display: block;
-  position: absolute; 
-  top: 280px;   
-  left: 125px;  
-  width: 330px;
-  height: 53px;
-  background: transparent;
-  cursor: pointer;
-  text-indent: -9999px;
-  border-radius: 25px;
-}
+    a {
+      display: block;
+      width: 100%;
+      height: 50px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      border-radius: 25px;
+      text-indent: -9999px; /* يخفي النص */
+    }
   </style>
 </head>
 <body>
   <div class="success-wrapper">
     <div class="success-content">
-      <a href="/submit.html">إرسال رسالة أخرى</a>
+      <a href="/submit-mobile.html">إرسال رسالة أخرى</a>
     </div>
   </div>
 </body>

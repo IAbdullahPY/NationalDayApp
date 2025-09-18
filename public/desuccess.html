@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>شكرا لمشاركتك</title>
+  <style>
+    /* ✅ يجعل الفورم يشتغل صح على الجوال */
+.form-wrapper,
+.success-wrapper {
+  width: 90vw;      /* ياخذ 90% من عرض الشاشة */
+  max-width: 400px; /* ما يكبر أكثر من 400px على الكمبيوتر */
+  height: auto;     /* الطول يتكيف */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* الحقول */
+input, textarea {
+  width: 100%;      /* ياخذ كل العرض داخل الفورم */
+  font-size: 16px;
+  padding: 10px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+}
+
+/* الزر */
+button, a {
+  width: 100%;
+  height: 45px;
+  font-size: 18px;
+  border-radius: 25px;
+}
+    body {
+      font-family: "Tahoma", sans-serif;
+      background: url("assets/bgsuccess.png") no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+    .success-wrapper {
+      position: relative;
+      width: 600px;  
+      height: 400px; 
+    }
+    .success-wrapper img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .success-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding-bottom: 30px;
+    }
+
+a {
+  display: block;
+  position: absolute; 
+  top: 280px;   
+  left: 125px;  
+  width: 330px;
+  height: 53px;
+  background: transparent;
+  cursor: pointer;
+  text-indent: -9999px;
+  border-radius: 25px;
+}
+  </style>
+</head>
+<body>
+  <div class="success-wrapper">
+    <div class="success-content">
+      <a href="/submit.html">إرسال رسالة أخرى</a>
+    </div>
+  </div>
+</body>
+</html>
